@@ -1,0 +1,15 @@
+body {
+    display: flex;
+    justify-content: center; /* 横方向中央 */
+    align-items: center;     /* 縦方向中央 */
+    background-color: black;
+    color: white;
+}
+#todoList {
+  list-style: none; /* リストの先頭の丸を消す */
+}
+
+#todoApp{
+    display: flex;
+    flex-direction: column; /* 縦方向に並べる*/
+}

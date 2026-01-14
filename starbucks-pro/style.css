@@ -1,0 +1,138 @@
+/* 全体の基本設定 */
+body {
+    font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+    background-color: #f7f7f7;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.container {
+    width: 100%;
+    max-width: 500px;
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+h1 {
+    color: #007042; /* スタバグリーン */
+    text-align: center;
+    font-size: 1.8rem;
+    margin-bottom: 30px;
+}
+
+/* 入力フォームのスタイル */
+input[type="text"],
+input[type="number"],
+select,
+textarea {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-sizing: border-box; /* 幅にパディングを含める */
+    font-size: 1rem;
+}
+
+textarea {
+    height: 80px;
+    resize: none;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #007042;
+    box-shadow: 0 0 5px rgba(0,112,66,0.2);
+}
+
+/* ボタンの共通スタイル */
+button {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+#saveBtn {
+    background-color: #007042;
+    color: white;
+    padding: 15px;
+    border: none;
+    border-radius: 25px; /* 丸みのあるボタン */
+    font-weight: bold;
+    font-size: 1rem;
+    width: 100%;
+    margin-top: 10px;
+}
+
+#saveBtn:hover {
+    background-color: #005935;
+}
+
+/* 履歴（ログ）のデザイン */
+.log-item {
+    background: #fff;
+    border-left: 5px solid #007042; /* 左側のアクセント線 */
+    margin-bottom: 15px;
+    padding: 15px;
+    border-radius: 0 8px 8px 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+}
+
+.log-date {
+    font-size: 0.75rem;
+    color: #999;
+    margin-bottom: 5px;
+}
+
+.log-title {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #333;
+}
+
+/* トースト通知 */
+.toast {
+    visibility: hidden;
+    min-width: 200px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 25px;
+    padding: 12px;
+    position: fixed;
+    z-index: 1;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.9rem;
+}
+
+.toast.show {
+    visibility: visible;
+    animation: fadein 0.5s, fadeout 0.5s 1.5s;
+}
+
+@keyframes fadein {
+    from {bottom: 0; opacity: 0;}
+    to {bottom: 30px; opacity: 1;}
+}
+
+@keyframes fadeout {
+    from {bottom: 30px; opacity: 1;}
+    to {bottom: 0; opacity: 0;}
+}
+
+/* スマホ対応の調整 */
+@media (max-width: 400px) {
+    .container {
+        padding: 15px;
+    }
+}

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>読書管理アプリ</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <h1>読書管理アプリ</h1>
+
+    <!--本の登録フォーム-->
+    <div class="form">
+    <input id="title" type="text" placeholder="タイトル">
+    <input id="author" type="text" placeholder="著者">
+    <button id="addBtn">追加</button>
+    </div>
+
+    <p>開始日
+    <input type="date" id="startDate" placeholder="開始日"></p>
+    <p>完了日
+    <input type="date" id="endDate" placeholder="完了日"></p>
+
+<!-- フィルター選択 -->
+<label for="filterSelect">表示：</label>
+<select id="filterSelect">
+  <option value="all">すべて</option>
+  <option value="unread">未読のみ</option>
+  <option value="done">完了のみ</option>
+</select>
+
+        <!--ソート機能-->
+    <select id="sortSelect">
+  <option value="title">タイトル順</option>
+  <option value="author">著者順</option>
+
+  </select>
+
+    <!--登録した本の表示エリア-->
+    <h2>登録した本</h2>
+    <input type="text" id="search" placeholder="キーワードで検索">
+    <button id="searchBtn">検索</button>
+    <div id="bookList"></div>
+
+    <!--進捗バー-->
+    <div id="progressContainer">
+  <div id="progressBar"></div>
+</div>
+<p id="progressText">進捗: 0 / 0</p>
+
+</body>
+</html

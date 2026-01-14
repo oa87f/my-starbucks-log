@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>きょうのスタバ</title>
+    <link rel="stylesheet" href="style.css"> 
+</head>
+<body>
+    <div class="container">
+        <h1>きょうのスタバ</h1>
+
+        <div id="login-ui" style="text-align: center; padding: 40px 0;">
+            <p>自分だけのスタバ記録を作ろう</p>
+            <button onclick="login()" style="background-color: #4285F4; color: white; padding: 12px 24px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 10px;">
+                Googleでログイン
+            </button>
+        </div>
+
+        <div id="main-ui" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #007042;">
+                <p id="user-name" style="font-weight: bold; color: #007042; margin: 0;"></p>
+                <button onclick="logout()" style="background: none; border: 1px solid #ccc; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.8rem;">ログアウト</button>
+            </div>
+            
+            <div class="input-form">
+                <input type="text" id="drinkName" placeholder="ドリンク名 (例: キャラメルマキアート)">
+                <div style="display: flex; gap: 10px;">
+                    <input type="number" id="drinkPrice" placeholder="金額 (円)" style="flex: 1;">
+                    <select id="drinkSize" style="flex: 1;">
+                        <option value="Short">Short</option>
+                        <option value="Tall" selected>Tall</option>
+                        <option value="Grande">Grande</option>
+                        <option value="Venti">Venti</option>
+                    </select>
+                </div>
+                <textarea id="memo" placeholder="カスタマイズや感想をメモ"></textarea>
+                <button id="saveBtn" style="width: 100%; background-color: #007042; color: white; padding: 12px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">
+                    自分専用に記録する
+                </button>
+            </div>
+
+            <div id="total-summary" style="background: #f1f8f3; padding: 15px; border-radius: 10px; margin: 20px 0; border: 1px solid #2d5e35; text-align: center; display: flex; justify-content: space-around;">
+                <div>
+                    <p style="margin: 0; font-size: 0.8rem; color: #2d5e35;">今月の合計</p>
+                    <span style="font-weight: bold;"><span id="monthlyPriceDisplay">0</span>円</span>
+                </div>
+                <div style="border-left: 1px solid #2d5e35; opacity: 0.3;"></div>
+                <div>
+                    <p style="margin: 0; font-size: 0.8rem; color: #2d5e35;">すべての合計</p>
+                    <span style="font-weight: bold;"><span id="totalPriceDisplay">0</span>円</span>
+                </div>
+            </div>
+
+            <hr>
+
+            <div id="history">
+                <p style="text-align: center; color: #888;">読み込み中...</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast">保存完了！☕️</div>
+
+    <script type="module" src="main.js"></script>
+</body>
+</html>
