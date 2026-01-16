@@ -4,8 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>きょうのスタバ</title>
-    <link rel="stylesheet" href="style.css"> 
-</head>
+    <link rel="stylesheet" href="style.css">
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#007042">
+    </head>
 <body>
     <div class="container">
         <h1>きょうのスタバ</h1>
@@ -24,6 +30,8 @@
             </div>
             
             <div class="input-form">
+                <input type="hidden" id="editId">
+
                 <input type="text" id="drinkName" placeholder="ドリンク名 (例: キャラメルマキアート)">
                 <div style="display: flex; gap: 10px;">
                     <input type="number" id="drinkPrice" placeholder="金額 (円)" style="flex: 1;">
@@ -35,8 +43,13 @@
                     </select>
                 </div>
                 <textarea id="memo" placeholder="カスタマイズや感想をメモ"></textarea>
+                
                 <button id="saveBtn" style="width: 100%; background-color: #007042; color: white; padding: 12px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">
                     自分専用に記録する
+                </button>
+
+                <button id="cancelEditBtn" onclick="cancelEdit()" style="display: none; width: 100%; background-color: #666; color: white; padding: 10px; border: none; border-radius: 5px; margin-top: 10px; cursor: pointer;">
+                    編集をやめる
                 </button>
             </div>
 

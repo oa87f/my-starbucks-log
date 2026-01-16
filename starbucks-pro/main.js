@@ -16,8 +16,9 @@ import {
     orderBy, 
     onSnapshot, 
     serverTimestamp,
-    doc,         // 削除機能のために追加
-    deleteDoc    // 削除機能のために追加
+    doc,
+    deleteDoc,
+    updateDoc // ★編集機能のために追加
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // あなたのプロジェクト設定
@@ -58,8 +59,51 @@ onAuthStateChanged(auth, (user) => {
 });
 
 /**
+ * 編集モードを開始する
+ * （履歴の「編集」ボタンから呼ばれます）
+ */
+window.startEdit = (id, name, price, size, memo) => {
+    // フォームに値をセット
+    document.getElementById('editId').value = id;
+    document.getElementById('drinkName').value = name;
+    document.getElementById('drinkPrice').value = price;
+    document.getElementById('drinkSize').value = size;
+    // メモの中の改行コード変換（簡易対応）
+    document.getElementById('memo').value = memo;
+
+    // ボタンの見た目を変える
+    const saveBtn = document.getElementById('saveBtn');
+    saveBtn.textContent = "変更を更新する 🔄";
+    saveBtn.style.backgroundColor = "#dda0dd"; // わかりやすく色を変える（紫など）
+
+    // キャンセルボタンを表示
+    document.getElementById('cancelEditBtn').style.display = "block";
+
+    // フォームまでスクロール
+    document.querySelector('.container').scrollIntoView({ behavior: 'smooth' });
+};
+
+/**
+ * 編集をキャンセルする
+ */
+window.cancelEdit = () => {
+    // フォームをリセット
+    document.getElementById('editId').value = "";
+    document.getElementById('drinkName').value = "";
+    document.getElementById('drinkPrice').value = "";
+    document.getElementById('memo').value = "";
+    
+    // ボタンを元に戻す
+    const saveBtn = document.getElementById('saveBtn');
+    saveBtn.textContent = "自分専用に記録する";
+    saveBtn.style.backgroundColor = "#007042";
+
+    // キャンセルボタンを隠す
+    document.getElementById('cancelEditBtn').style.display = "none";
+};
+
+/**
  * データの削除機能
- * HTMLのonclickから呼べるようにwindowオブジェクトに追加します
  */
 window.deleteLog = async (id) => {
     if (!confirm("この記録を削除してもよろしいですか？")) return;
@@ -67,6 +111,10 @@ window.deleteLog = async (id) => {
     try {
         await deleteDoc(doc(db, "user_logs", id));
         showToast("削除しました 🗑️");
+        // もし編集中だったらキャンセル扱いにする
+        if(document.getElementById('editId').value === id) {
+            window.cancelEdit();
+        }
     } catch (e) {
         console.error("削除エラー:", e);
         alert("削除に失敗しました");
@@ -86,48 +134,77 @@ const fetchMyLogs = (uid) => {
     onSnapshot(q, (snapshot) => {
         const historyDiv = document.getElementById('history');
         const totalPriceDisplay = document.getElementById('totalPriceDisplay');
+        const monthlyPriceDisplay = document.getElementById('monthlyPriceDisplay');
+        
         historyDiv.innerHTML = "";
         
-        // データが空（0件）の場合の処理
+        // データが空（0件）の場合
         if (snapshot.empty) {
             historyDiv.innerHTML = `
-                <div style="text-align: center; color: #888; padding: 40px 0;">
-                    <p>まだ記録がありません。<br>最初の1杯を記録しましょう！☕️</p>
+                <div style="text-align: center; padding: 40px 20px; color: #888;">
+                    <p style="font-size: 3rem; margin-bottom: 10px;">☕️</p>
+                    <p>まだ記録がありません。<br>今日の一杯を記録してみよう！</p>
                 </div>
             `;
-            totalPriceDisplay.textContent = "0";
-            return; // ここで処理を終了
+            if(totalPriceDisplay) totalPriceDisplay.textContent = "0";
+            if(monthlyPriceDisplay) monthlyPriceDisplay.textContent = "0";
+            return;
         }
 
         let totalPrice = 0;
+        let monthlyPrice = 0;
+        
+        // 今月かどうか判定するための準備
+        const now = new Date();
+        const currentMonth = now.getMonth();
+        const currentYear = now.getFullYear();
+
         snapshot.forEach((docSnap) => {
             const data = docSnap.data();
             const id = docSnap.id;
             const price = Number(data.price || 0);
+            
             totalPrice += price;
 
-            const date = data.timestamp?.toDate().toLocaleString('ja-JP') || "保存中...";
+            // 今月の計算
+            const dateObj = data.timestamp ? data.timestamp.toDate() : null;
+            if (dateObj && dateObj.getMonth() === currentMonth && dateObj.getFullYear() === currentYear) {
+                monthlyPrice += price;
+            }
+
+            const dateStr = dateObj ? dateObj.toLocaleString('ja-JP') : "保存中...";
+            
+            // メモのエスケープ（簡易版：HTMLが崩れないように）
+            const safeMemo = (data.memo || "").replace(/"/g, '&quot;'); 
+            const safeName = (data.name || "").replace(/"/g, '&quot;');
             
             historyDiv.innerHTML += `
-                <div class="log-item" style="border-bottom: 1px solid #eee; padding: 15px 0; position: relative;">
-                    <div style="font-size: 0.8rem; color: #888;">${date}</div>
-                    <div style="font-weight: bold; color: #007042;">${data.name} (${data.size})</div>
-                    <div style="font-size: 0.9rem;">${price.toLocaleString()}円</div>
-                    <div style="font-size: 0.8rem; color: #555; margin-top: 5px;">${data.memo || ""}</div>
-                    <button onclick="deleteLog('${id}')" 
-                            style="position: absolute; top: 15px; right: 0; background: none; border: none; color: #ccc; cursor: pointer; font-size: 0.8rem;">
-                        削除
-                    </button>
+                <div class="log-item" style="position: relative; padding-right: 80px;"> <div class="log-date">${dateStr}</div>
+                    <div class="log-title">${data.name} <span style="font-size:0.8em; font-weight:normal;">(${data.size})</span></div>
+                    <div style="font-size: 1.1rem; font-weight: bold; color: #333;">${price.toLocaleString()}円</div>
+                    <div style="font-size: 0.9rem; color: #666; margin-top: 5px; white-space: pre-wrap;">${data.memo || "メモなし"}</div>
+                    
+                    <div style="position: absolute; top: 15px; right: 10px; display: flex; gap: 5px;">
+                        <button onclick="startEdit('${id}', '${safeName}', '${price}', '${data.size}', '${safeMemo.replace(/\n/g, '\\n')}')" 
+                                style="background: white; border: 1px solid #ccc; border-radius: 4px; color: #555; cursor: pointer; font-size: 0.8rem; padding: 4px 8px;">
+                            🖊️
+                        </button>
+                        <button onclick="deleteLog('${id}')" 
+                                style="background: white; border: 1px solid #ff4d4d; border-radius: 4px; color: #ff4d4d; cursor: pointer; font-size: 0.8rem; padding: 4px 8px;">
+                            🗑️
+                        </button>
+                    </div>
                 </div>
             `;
         });
 
-        totalPriceDisplay.textContent = totalPrice.toLocaleString();
+        if (totalPriceDisplay) totalPriceDisplay.textContent = totalPrice.toLocaleString();
+        if (monthlyPriceDisplay) monthlyPriceDisplay.textContent = monthlyPrice.toLocaleString();
     });
 };
 
 /**
- * データの保存
+ * データの保存（新規・更新 共通）
  */
 document.getElementById('saveBtn').addEventListener('click', async () => {
     const user = auth.currentUser;
@@ -137,27 +214,57 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
     const price = document.getElementById('drinkPrice').value;
     const size = document.getElementById('drinkSize').value;
     const memo = document.getElementById('memo').value;
+    const editId = document.getElementById('editId').value; // ★編集中のIDを取得
+    const saveBtn = document.getElementById('saveBtn');
 
-    if (!name) return alert("ドリンク名を入力してください");
+    // バリデーション
+    if (!name) return alert("ドリンク名を入力してください 🥤");
+    if (price === "" || Number(price) < 0) return alert("正しい金額を入力してください 💰");
+
+    // ボタン無効化（連打防止）
+    saveBtn.disabled = true;
+    saveBtn.textContent = "処理中...";
 
     try {
-        await addDoc(collection(db, "user_logs"), {
-            name: name,
-            price: Number(price),
-            size: size,
-            memo: memo,
-            uid: user.uid,
-            timestamp: serverTimestamp()
-        });
+        if (editId) {
+            // ★IDがあるなら「更新 (update)」
+            await updateDoc(doc(db, "user_logs", editId), {
+                name: name,
+                price: Number(price),
+                size: size,
+                memo: memo,
+                // timestampは更新しない方が「いつ飲んだか」が残るのであえて更新しない設計にします
+                updatedAt: serverTimestamp() // 編集日時だけ記録しておく
+            });
+            showToast("修正しました！✏️");
+            window.cancelEdit(); // 編集モード終了
+        } else {
+            // ★IDがないなら「新規作成 (add)」
+            await addDoc(collection(db, "user_logs"), {
+                name: name,
+                price: Number(price),
+                size: size,
+                memo: memo,
+                uid: user.uid,
+                timestamp: serverTimestamp()
+            });
+            
+            // フォームのリセット
+            document.getElementById('drinkName').value = "";
+            document.getElementById('drinkPrice').value = "";
+            document.getElementById('memo').value = "";
+            showToast("記録しました！☕️");
+        }
 
-        document.getElementById('drinkName').value = "";
-        document.getElementById('drinkPrice').value = "";
-        document.getElementById('memo').value = "";
-        
-        showToast("記録しました！☕️");
     } catch (e) {
-        console.error("保存エラー:", e);
-        alert("保存に失敗しました。");
+        console.error("エラー:", e);
+        alert("処理に失敗しました。");
+    } finally {
+        saveBtn.disabled = false;
+        // 編集モードでなければボタン文字を戻す
+        if(!document.getElementById('editId').value) {
+            saveBtn.textContent = "自分専用に記録する";
+        }
     }
 });
 
@@ -173,3 +280,11 @@ const showToast = (message) => {
     toast.classList.add('show');
     setTimeout(() => toast.classList.remove('show'), 2000);
 };
+
+/**
+ * PWA（アプリ化）の登録
+ */
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js')
+        .then(function() { console.log('Service Worker Registered'); });
+}
