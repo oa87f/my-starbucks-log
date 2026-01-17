@@ -4,18 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sip.</title>
-    <link rel="stylesheet" href="style.css">
     
+    <!-- OGP設定 (SNSシェア用) -->
+    <meta property="og:title" content="Sip.">
+    <meta property="og:description" content="スタバの履歴を記録して、毎月の金額も管理できる自分専用アプリ。">
+    <meta property="og:image" content="https://cafe-log-pro.web.app/ogp_image.png">
+    <meta property="og:url" content="https://cafe-log-pro.web.app">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <link rel="stylesheet" href="style.css"> 
+    
+    <!-- PWA & アプリ化設定 -->
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon.png">
     <link rel="icon" href="icon.png">
-    <meta name="mobile-web-app-capable" content="Sip.">
 
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <!-- ここを修正・追加しました -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Sip."> <!-- iPhone用アプリ名 -->
     
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#007042">
-    </head>
+</head>
 <body>
     <div class="container">
         <h1>Sip.</h1>
